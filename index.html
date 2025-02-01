@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>每日简讯 - DeepSeek R1</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 20px auto; padding: 0 20px; }
+        .category { margin: 30px 0; border-bottom: 2px solid #eee; }
+        .news-item { margin: 15px 0; padding: 10px; background: #f8f9fa; border-radius: 5px; }
+        .source { color: #666; font-size: 0.9em; }
+        .summary { color: #333; line-height: 1.6; }
+    </style>
+</head>
+<body>
+    <h1>📰 今日精选</h1>
+    <div id="news"></div>
+
+    <script>
+        // 配置：修改分类和对应关键词
+        const categories = [
+            { name: '科技', keywords: 'AI+5G+量子' },
+            { name: '财经', keywords: '经济+股票+政策' },
+            { name: '健康', keywords: '医学+疫苗+营养' }
+        ];
+
+        async function fetchNews() {
+            const apiKey = '94485bb84dc546758a1d10316e02b666';
+            let html = '';
+
+            for (const category of categories) {
+                const response = await fetch(
+                    `https://newsapi.org/v2/everything?q=${encodeURIComponent(category.keywords)}&language=zh&sortBy=publishedAt&apiKey=${apiKey}`
+                );
+                const data = await response.json();
+                
+                html += `<div class="category">
+                            <h2>${category.name}</h2>
+                            ${data.articles.slice(0, 3).map(article => `
+                                <div class="news-item">
+                                    <div class="source">来源：${article.source.name}</div>
+                                    <div class="summary">${article.title}</div>
+                                </div>
+                            `).join('')}
+                         </div>`;
+            }
+
+            document.getElementById('news').innerHTML = html;
+        }
+
+        // 页面加载时获取新闻
+        fetchNews();
+    </script>
+</body>
+</html>
