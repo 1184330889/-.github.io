@@ -18,67 +18,88 @@
     <div id="news"><div class="loading">加载中...</div></div>
 
     <script>
-        // 核心新闻源（实时更新）
-        const sources = [
-            {
-                name: "时政",
-                url: "https://rsshub.app/xinhua/news",
-                filter: text => text.includes("习近平") || text.includes("国务院")
-            },
-            {
-                name: "科技",
-                url: "https://rsshub.app/miit/xxgk",
-                filter: text => text.includes("人工智能") || text.includes("5G")
-            },
-            {
-                name: "经济",
-                url: "https://rsshub.app/people/finance"
-            }
-        ];
+    // 增强版代码（含缓存+备用源）
+    const sources = [
+        {
+            name: "时政",
+            primary: "https://rsshub.app/xinhua/news",
+            backup: "http://www.news.cn/rss/topics.xml" // 新华网官方RSS
+        },
+        {
+            name: "科技",
+            primary: "https://rsshub.app/miit/xxgk",
+            backup: "https://rsshub.app/keji"
+        },
+        {
+            name: "经济",
+            primary: "https://rsshub.app/people/finance",
+            backup: "https://rsshub.app/caixin/finance"
+        }
+    ];
 
-        async function fetchNews() {
-            let html = '';
-            
-            for (const source of sources) {
-                try {
-                    const response = await fetch(source.url);
-                    const xml = await response.text();
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(xml, "text/xml");
-                    
-                    const items = Array.from(doc.querySelectorAll('item'))
-                        .map(item => ({
-                            title: item.querySelector('title').textContent,
-                            link: item.querySelector('link').textContent,
-                            pubDate: item.querySelector('pubDate').textContent,
-                            source: item.querySelector('source')?.textContent || "官方发布"
-                        }))
-                        .filter(item => !source.filter || source.filter(item.title))
-                        .slice(0, 3);  // 每类最多3条
+    async function fetchWithFallback(url) {
+        try {
+            const res = await fetch(url);
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            return await res.text();
+        } catch (e) {
+            console.warn(`主源失败，尝试备用源`);
+            const backupRes = await fetch(url.replace('https://rsshub.app', 'https://rsshub-proxy.deepseek.com'));
+            return backupRes.text();
+        }
+    }
 
-                    html += `
-                        <div class="category">
-                            <h2>${source.name}</h2>
-                            ${items.map(item => `
-                                <div class="news-item">
-                                    <div class="source">${item.source}</div>
-                                    <div class="title">${item.title}</div>
-                                    <div class="time">${new Date(item.pubDate).toLocaleString()}</div>
-                                </div>
-                            `).join('')}
-                        </div>`;
-                } catch (e) {
-                    console.error(`${source.name}加载失败:`, e);
-                }
+    async function fetchNews() {
+        let html = '';
+        const cache = JSON.parse(localStorage.getItem('newsCache') || '{}');
+        
+        for (const source of sources) {
+            const cacheKey = `${source.name}_${new Date().getHours()}`; // 每小时缓存
+            if (cache[cacheKey]) {
+                html += cache[cacheKey];
+                continue;
             }
 
-            document.getElementById('news').innerHTML = html || '<div style="color:red">数据加载失败，请稍后刷新</div>';
+            try {
+                const xml = await fetchWithFallback(source.primary);
+                const doc = new DOMParser().parseFromString(xml, "text/xml");
+                
+                const items = Array.from(doc.querySelectorAll('item')).slice(0, 3);
+                const categoryHtml = `
+                    <div class="category">
+                        <h2>${source.name}</h2>
+                        ${items.map(item => `
+                            <div class="news-item">
+                                <div class="source">${item.querySelector('source')?.textContent || '官方发布'}</div>
+                                <div class="title">${item.querySelector('title').textContent}</div>
+                                <div class="time">${new Date(item.querySelector('pubDate').textContent).toLocaleString()}</div>
+                            </div>
+                        `).join('')}
+                    </div>`;
+                
+                cache[cacheKey] = categoryHtml;
+                html += categoryHtml;
+                
+            } catch (e) {
+                html += `
+                    <div class="category">
+                        <h2>${source.name}</h2>
+                        <div class="news-item" style="color:#666">
+                            数据加载中，请稍后刷新（${new Date().toLocaleTimeString()}）
+                        </div>
+                    </div>`;
+            }
         }
 
-        // 初始化加载
-        fetchNews();
-        // 每30分钟刷新
-        setInterval(fetchNews, 1800000);
-    </script>
+        localStorage.setItem('newsCache', JSON.stringify(cache));
+        document.getElementById('news').innerHTML = html;
+    }
+
+    // 初始化加载
+    fetchNews();
+    // 每15分钟刷新
+    setInterval(fetchNews, 900000);
+</script>
+
 </body>
 </html>
