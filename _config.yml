@@ -1,3 +1,12 @@
+# 主题设置
 theme: jekyll-theme-hacker
-title: "YHR"
-description: "YOLO 你只活一次！"
+
+# 网站基础信息 (请修改为您自己的)
+title: 我的知识库 | YHR
+description: YOLO 你只活一次 | YHR
+
+# 关键配置 (请勿修改)
+url: https://1184330889.github.io
+
+# 以下为空，或者直接删除 baseurl 这一行
+baseurl: ""
