@@ -1,9 +1,11 @@
 ---
 layout: post
-title:  "Hello, Hacker World!"
-date:   2025-08-11
+title:  "你好，黑客世界！"
+date:   2025-08-11 22:00:00 +0800
+categories: 测试
+tags: [开始]
 ---
 
-This is my first post in my new knowledge base.
+这是我知识库里的第一篇文章。
 
-The setup seems to be working!
+这个设置看起来成功了！
