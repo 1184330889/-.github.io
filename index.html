@@ -1,105 +1,150 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh">
 <head>
     <meta charset="UTF-8">
-    <title>权威速报 - DeepSeek R1</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>梅花易数运势分析</title>
     <style>
-        body { font-family: '微软雅黑', sans-serif; max-width: 800px; margin: 20px auto; padding: 0 20px; }
-        .loading { text-align: center; color: #666; padding: 50px; }
-        .category { margin: 30px 0; }
-        .news-item { margin: 15px 0; padding: 15px; background: #f8f9fa; border-radius: 8px; }
-        .source { color: #d32f2f; font-size: 0.9em; }
-        .title { color: #1a237e; margin: 8px 0; }
-        .time { color: #666; font-size: 0.85em; }
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"], input[type="date"], input[type="time"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .result {
+            display: none;
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
     </style>
 </head>
 <body>
-    <h1>🏛️ 权威速报</h1>
-    <div id="news"><div class="loading">加载中...</div></div>
+    <div class="container">
+        <h1>梅花易数运势分析</h1>
+        
+        <div class="form-group">
+            <label for="name">您的姓名：</label>
+            <input type="text" id="name" placeholder="请输入您的姓名">
+        </div>
+        
+        <div class="form-group">
+            <label for="birth_date">出生日期：</label>
+            <input type="date" id="birth_date">
+        </div>
+        
+        <div class="form-group">
+            <label for="target_date">查询日期：</label>
+            <input type="date" id="target_date">
+        </div>
+        
+        <div class="form-group">
+            <label for="question">您的问题：</label>
+            <input type="text" id="question" placeholder="例如：出行是否顺利">
+        </div>
+        
+        <div class="form-group">
+            <label>
+                <input type="checkbox" id="use_lunar">
+                使用农历计算
+            </label>
+        </div>
+        
+        <button onclick="analyze()">开始分析</button>
+        
+        <div id="result" class="result"></div>
+    </div>
 
     <script>
-    // 增强版代码（含缓存+备用源）
-    const sources = [
-        {
-            name: "时政",
-            primary: "https://rsshub.app/xinhua/news",
-            backup: "http://www.news.cn/rss/topics.xml" // 新华网官方RSS
-        },
-        {
-            name: "科技",
-            primary: "https://rsshub.app/miit/xxgk",
-            backup: "https://rsshub.app/keji"
-        },
-        {
-            name: "经济",
-            primary: "https://rsshub.app/people/finance",
-            backup: "https://rsshub.app/caixin/finance"
+        function analyze() {
+            // 获取表单数据
+            const name = document.getElementById('name').value;
+            const birthDate = document.getElementById('birth_date').value;
+            const targetDate = document.getElementById('target_date').value;
+            const question = document.getElementById('question').value;
+            const useLunar = document.getElementById('use_lunar').checked;
+            
+            // 这里应该调用您的Python程序
+            // 由于浏览器无法直接运行Python，我们需要使用后端API
+            
+            // 模拟结果（实际应用中应该从服务器获取）
+            const mockResult = {
+                name: name,
+                lunar: {
+                    year_gan: "甲",
+                    year_zhi: "子"
+                },
+                datetime: targetDate + " 12:00:00",
+                main: {
+                    name: "乾为天",
+                    code: "111111",
+                    judgement: "元亨利贞：象征刚健自强、积极向上。",
+                    moving_yao_text: "初九：潜龙勿用——藏锋蓄势，暂不露头。"
+                },
+                changed: {
+                    name: "坤为地",
+                    code: "000000",
+                    judgement: "厚德载物：包容与承载，适合稳固基础。"
+                }
+            };
+            
+            // 显示结果
+            const resultDiv = document.getElementById('result');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = `
+                <h2>分析结果</h2>
+                <p><strong>姓名：</strong>${mockResult.name}</p>
+                <p><strong>生辰五行：</strong>${mockResult.lunar.year_gan}${mockResult.lunar.year_zhi}</p>
+                <p><strong>查询日期：</strong>${mockResult.datetime}</p>
+                <p><strong>主卦：</strong>${mockResult.main.name}（${mockResult.main.code}）</p>
+                <p><strong>变卦：</strong>${mockResult.changed.name}（${mockResult.changed.code}）</p>
+                <h3>综合建议：</h3>
+                <p><strong>主卦解读：</strong>${mockResult.main.judgement}</p>
+                <p><strong>变爻解读：</strong>${mockResult.main.moving_yao_text}</p>
+                <p><strong>变卦解读：</strong>${mockResult.changed.judgement}</p>
+            `;
         }
-    ];
-
-    async function fetchWithFallback(url) {
-        try {
-            const res = await fetch(url);
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
-            return await res.text();
-        } catch (e) {
-            console.warn(`主源失败，尝试备用源`);
-            const backupRes = await fetch(url.replace('https://rsshub.app', 'https://rsshub-proxy.deepseek.com'));
-            return backupRes.text();
-        }
-    }
-
-    async function fetchNews() {
-        let html = '';
-        const cache = JSON.parse(localStorage.getItem('newsCache') || '{}');
-        
-        for (const source of sources) {
-            const cacheKey = `${source.name}_${new Date().getHours()}`; // 每小时缓存
-            if (cache[cacheKey]) {
-                html += cache[cacheKey];
-                continue;
-            }
-
-            try {
-                const xml = await fetchWithFallback(source.primary);
-                const doc = new DOMParser().parseFromString(xml, "text/xml");
-                
-                const items = Array.from(doc.querySelectorAll('item')).slice(0, 3);
-                const categoryHtml = `
-                    <div class="category">
-                        <h2>${source.name}</h2>
-                        ${items.map(item => `
-                            <div class="news-item">
-                                <div class="source">${item.querySelector('source')?.textContent || '官方发布'}</div>
-                                <div class="title">${item.querySelector('title').textContent}</div>
-                                <div class="time">${new Date(item.querySelector('pubDate').textContent).toLocaleString()}</div>
-                            </div>
-                        `).join('')}
-                    </div>`;
-                
-                cache[cacheKey] = categoryHtml;
-                html += categoryHtml;
-                
-            } catch (e) {
-                html += `
-                    <div class="category">
-                        <h2>${source.name}</h2>
-                        <div class="news-item" style="color:#666">
-                            数据加载中，请稍后刷新（${new Date().toLocaleTimeString()}）
-                        </div>
-                    </div>`;
-            }
-        }
-
-        localStorage.setItem('newsCache', JSON.stringify(cache));
-        document.getElementById('news').innerHTML = html;
-    }
-
-    // 初始化加载
-    fetchNews();
-    // 每15分钟刷新
-    setInterval(fetchNews, 900000);
-</script>
-
+    </script>
 </body>
 </html>
