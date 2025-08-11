@@ -153,4 +153,3 @@ class PasswordProtect {
 document.addEventListener('DOMContentLoaded', () => {
     new PasswordProtect(passwordConfig);
 });
-
